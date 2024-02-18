@@ -1,7 +1,10 @@
 
-const Person = ({name, phone}) => {
+const Person = ({ person, deletePerson }) => {
   return (
-    <div><b>{name}</b>: {phone}</div>
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <div ><b>{person.name}</b>: {person.number}</div>
+      <button onClick={() => deletePerson(person.id)}>Delete</button>
+    </div>
   )
 }
 
