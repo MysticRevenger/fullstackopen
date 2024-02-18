@@ -3,6 +3,7 @@ import phoneService from "./services/phoneService";
 import PersonForm from "./Components/PersonForm";
 import Person from "./Components/Person";
 import Search from "./Components/Search";
+import Notification from "./Components/Notification";
 import { v4 as uuidv4 } from "uuid"
 
 console.log(uuidv4());
@@ -12,11 +13,10 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [notification, setNotification] = useState(null)
 
   const numberRegex = /^[+]?[(]?[0-9]{3}[)]?[-s.]?[0-9]{3}[-s.]?[0-9]{4,6}$/;
   const nameRegex = /^[A-Za-z]+$/;
-
-
 
 
   useEffect(() => {
@@ -60,7 +60,11 @@ const App = () => {
                     : returnedPerson
                 )
             )
-            window.alert("successfully updated")
+            setNotification({
+              text: `${checkPerson.name}'s number was updated.`,
+              type: 'notification'
+            })
+            setTimeout(() => setNotification(null), 5000)
           })
           .catch(error =>
             setPersons(persons
@@ -69,7 +73,13 @@ const App = () => {
               )
             )
           )
-
+        setNotification({
+          text: `${checkPerson.name} has already been deleted from the server.`,
+          type: 'error'
+        })
+        setTimeout(() => {
+          setNotification(null)
+        }, 5000)
       }
     }
     else {
@@ -81,6 +91,23 @@ const App = () => {
           setNewNumber("");
         }
         )
+        .catch(error => {
+          setNotification({
+            text: error.response.data.error,
+            type: 'error'
+          })
+          setTimeout(() => {
+            setNotification(null)
+          }, 5000)
+        })
+
+      setNotification({
+        text: `${personObj.name} added to the phonebook.`,
+        type: 'notification'
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
     }
   };
 
@@ -96,7 +123,13 @@ const App = () => {
       // }
       // )
       setPersons(persons.filter(person => person.id !== id))
-      window.alert(`${person.name} is successfully deleted`)
+      setNotification({
+        text: `${person.name} was deleted from the phonebook.`,
+        type: 'notification'
+      })
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
     }
   }
 
@@ -114,6 +147,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification} />
       <PersonForm
         addNewPerson={addNewPerson}
         newName={newName}
